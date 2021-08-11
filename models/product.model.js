@@ -21,7 +21,6 @@ const ProductSchema = new Schema(
         "Can't enter a product without description, please enter description of the product",
     },
     ratings: Number,
-    // if fast deleviery is false , the ndelivery : within 3-5 days
     image: {
       type: mongoose.SchemaTypes.Url,
       required:

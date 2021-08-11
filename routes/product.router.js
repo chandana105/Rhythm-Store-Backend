@@ -7,7 +7,7 @@ router
   .route("/")
   .get(async (_, res) => {
     try {
-      const products = await Product.find({});
+      const products = await Product.find({})     ;
       const message =
         products.length === 0
           ? "There are no products in the Collection, please start inserting them."
