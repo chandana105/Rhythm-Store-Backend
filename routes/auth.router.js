@@ -1,14 +1,30 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken')
+const mySecret = process.env['SECRET_KEY']
+
 const { User } = require('../models/user.model.js');
 
+const checkExistingUser = async (req, res, next) => {
+  try {
+    const user = req.body;
+    const emailExist = await User.findOne({ email: user.email })
+    if (emailExist) {
+      return res.status(409).json({ success: false, message: "User already exists" })
+    }
+    req.user = user;
+    next();
+  } catch (err) {
+    console.log('AUTH ROUTER', err)
+  }
 
+}
 
-router.route('/sign-up' )
-  .post( async (req, res) => {
+router.route('/sign-up')
+  .post(checkExistingUser, async (req, res) => {
     try {
-      const user = req.body;
+      const user = req.user;
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(user.password, salt)
       user.password = hashedPassword
@@ -22,6 +38,41 @@ router.route('/sign-up' )
         errorMessage: err.message,
       });
     }
+  })
+
+
+const getUserByEmail = async (req, res, next) => {
+  try {
+    const user = req.body
+    const userExist = await User.findOne({ email: user.email })
+    if (userExist) {
+      const validPassword = await bcrypt.compare(user.password, userExist.password);
+      console.log(validPassword, 'password is valid')
+      if (validPassword) {
+        req.user = userExist;
+        return next();
+      }
+    }
+    res.status(401).json({ success: false, message: "email or password incorrect , please enter valid email and password" })
+  } catch (err) {
+    res
+      .status(400)
+      .json({ success: false, message: "Incorrect Email and password" });
+  }
+
+}
+
+
+router.route('/login')
+  .post(getUserByEmail,async(req, res) => {
+    const { _id, email, password, username } = req.user;
+    try {
+      const token = await jwt.sign({ userID: _id }, mySecret, { expiresIn: '24h' })
+      res.json({ success: true, token, message: "User authenticated successfully" })
+    } catch (err) {
+      res.status(500).json({ success: false, message: 'Unauthorised Access, Unable to Login User', errorMessage: err.message })
+    }
+
   })
 
 
