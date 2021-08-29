@@ -1,0 +1,32 @@
+{
+  "files": {
+    "routes/auth.router.js": [
+      {
+        "id": "7c9a646a-8ef3-45b4-970f-cda6b2158799",
+        "line": 11,
+        "version": 1400,
+        "index": 312
+      },
+      {
+        "id": "3c7b1f5e-6b1d-4afb-9b7a-25cd61d2d126",
+        "line": 81,
+        "version": 1390,
+        "index": 2344
+      }
+    ],
+    "routes/cart.router.js": [
+      {
+        "id": "3d66f7a0-fd5e-40cf-9e56-6853a9dbea5b",
+        "line": 32,
+        "version": 5527,
+        "index": 984
+      },
+      {
+        "id": "52fef63f-758f-4702-b845-da86ca00b1a7",
+        "line": 67,
+        "version": 5527,
+        "index": 1985
+      }
+    ]
+  }
+}

@@ -6,25 +6,22 @@ const ItemSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Product"
   },
-  quantity: {
-    type: Number,
-    default: 1
-  },
 })
 
-const CartSchema = new Schema({
+
+const WishlistSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     index: true,
     unique: true
   },
-  cartList: [ItemSchema]
+  wishlist: [ItemSchema]
 }, {
     timestamps: true
   })
 
-const Cart = mongoose.model("Cart", CartSchema)
+const Wishlist = mongoose.model("Wishlist", WishlistSchema)
 
-module.exports = { Cart }
+module.exports = { Wishlist }
 

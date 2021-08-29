@@ -1,91 +1,82 @@
 const express = require("express");
 const router = express.Router();
 const { Cart } = require('../models/cart.model.js')
-const { extend } = require("lodash");
+const { extend, concat } = require("lodash");
+const { findCartByUserId, findCartItemById } = require('../middlewares/cart.middleware.js')
 
 
-router
-  .route('/')
-  .get(async (_, res) => {
-    try {
-      const cart = await Cart.find({}).populate("cartList.product")
-      const message =
-        cart.length === 0
-          ? "There are no products in the Cart, please start adding them."
-          : undefined;
-      res.json({ success: true, cart, message });
-    } catch (err) {
-      res.status(500).json({
-        success: false,
-        message: "Unable to find cart products",
-        errorMessage: err.message,
-      });
-    }
-  })
-  .post(async (req, res) => {
-    try {
-      const cart = req.body
-      const NewCart = new Cart(cart)
-      const savedCart = await NewCart.save()
-      res.json({ success: true, cart: savedCart })
-    } catch (err) {
-      res.status(500).json({ success: false, message: "Unable to save cart", errorMessage: err.message })
-    }
-  })
-  .delete(async (_, res) => {
-    try {
-      await Cart.deleteMany({});
-      res.status(200).json({
-        success: true,
-        deleted: true,
-        message: "All Products are deleted from the Carts",
-      });
-    } catch (err) {
-      res.status(500).json({
-        success: false,
-        deleted: false,
-        message: "Couldn't delete the Cart",
-        errorMessage: err.message,
-      });
-    }
-  });
-
-router.param("cartId", async (req, res, next, cartId) => {
+const addToCart = async (req, res, next) => {
+  let { user } = req;
+  let { userId } = user;
+  const { cartListUpdate } = req.body;
   try {
-    const cart = await Cart.findById(cartId).populate("cartList.product");
-    if (!cart) {
-      return res.status(400).json({
-        success: false,
-        message: "Couldn't get your cart, Please check the cartId again.",
-      });
+    let cartExist = await Cart.findOne({ userId: userId });
+    cartListUpdate.cartList[0]._id = cartListUpdate.cartList[0].product;
+    if (cartExist) {
+      cartExist.cartList = concat(cartExist.cartList, cartListUpdate.cartList);
+      await cartExist.save();
+      return next();
+    } else {
+      const NewCart = await Cart({ userId: userId, cartList: cartListUpdate.cartList });
+      await NewCart.save();
+      return next();
     }
-    req.cart = cart;
-    next();
   } catch (err) {
-    res
-      .status(400)
-      .json({ success: false, message: "Please check your cartId again" });
+    console.log('adding to cart ', err)
   }
-});
+}
 
 router
-  .route("/:cartId")
+  .route("/userId")
+  .get(findCartByUserId, async (req, res) => {
+    const { cart } = req;
+    res.json({ success: true, cart })
+  })
+  .post(addToCart, async (req, res) => {
+    let { user } = req;
+    let { userId } = user;
+    try {
+      const cart = await Cart.findOne({ userId: userId }).populate('cartList.product');
+      res.json({ success: true, cart })
+    } catch (err) {
+      res.status(500).json({ success: false, message: "Unable to add products to Cart", errorMessage: err.message })
+    }
+  })
+  .delete(findCartByUserId, async (req, res) => {
+    const { cart } = req;
+    const deletedCart = await cart.remove();
+    res.json({ success: true, deleted: true, deletedCart })
+  })
+
+router.use(findCartByUserId)
+
+router.param("cartItemId", findCartItemById)
+
+
+router
+  .route("/userId/:cartItemId")
   .get((req, res) => {
-    let { cart } = req;
-    cart.__v = undefined;
-    res.json({ success: true, cart });
+    let { cartItem } = req;
+    res.json({ success: true, cartItem });
   })
+
+  // post mein we ll send qty object to update
   .post(async (req, res) => {
-    const cartUpdates = req.body;
-    let { cart } = req;
-    cart = extend(cart, cartUpdates);
-    cart = await cart.save();
-    res.json({ success: true, updatedCart: cart });
+    const cartItemUpdates = req.body;
+    let { cartItem, cart } = req;
+    cartItem = extend(cartItem, cartItemUpdates);
+    await cart.save()
+    res.json({ success: true, updatedCartItem: cartItem });
   })
+
   .delete(async (req, res) => {
-    let { cart } = req;
-    await cart.remove();
-    res.json({ success: true, deletedCart: cart, deleted: true });
+    let { cartItem, cart } = req;
+    await cartItem.remove();
+    await cart.save()
+    res.json({ success: true, deletedCartItem: cartItem, deleted: true });
   });
 
 module.exports = router;
+
+
+

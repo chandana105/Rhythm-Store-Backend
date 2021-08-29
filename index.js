@@ -7,6 +7,9 @@ const { errorHandler } = require("./middlewares/error-handler.middleware.js");
 const {
   routeNotFound,
 } = require("./middlewares/route-not-found.middleware.js");
+const {
+  authVerify,
+} = require("./middlewares/auth-handler.middleware.js");
 
 const app = express();
 app.use(bodyParser.json());
@@ -17,8 +20,11 @@ initializeDBConnection();
 
 const insertIntoDB = require("./routes/insertIntoDB.router");
 const products = require("./routes/product.router");
-const cart = require('./routes/cart.router.js');
+const user = require("./routes/user.router");
 const auth = require('./routes/auth.router.js')
+const cart = require('./routes/cart.router.js');
+const wishlist = require('./routes/wishlist.router.js');
+
 
 app.get("/", (_, res) => {
   res.json("Hello World");
@@ -26,11 +32,11 @@ app.get("/", (_, res) => {
 
 app.use("/insert", insertIntoDB);
 app.use("/products", products);
-app.use('/cart' , cart)
-
-
-
 app.use('/auth' , auth)
+app.use('/user' , authVerify , user)
+app.use('/cart' , authVerify , cart)
+app.use('/wishlist' , authVerify , wishlist)
+
 
 // Keep at end to handle errors and 404s
 app.use(routeNotFound);
