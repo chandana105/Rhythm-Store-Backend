@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+ const mongoose = require("mongoose");
 const express = require("express");
 const bodyParser = require('body-parser')
 const cors = require("cors");
@@ -20,6 +20,7 @@ initializeDBConnection();
 
 const insertIntoDB = require("./routes/insertIntoDB.router");
 const products = require("./routes/product.router");
+const categories = require('./routes/category.router.js')
 const user = require("./routes/user.router");
 const auth = require('./routes/auth.router.js')
 const cart = require('./routes/cart.router.js');
@@ -27,11 +28,12 @@ const wishlist = require('./routes/wishlist.router.js');
 
 
 app.get("/", (_, res) => {
-  res.json("Hello World");
+  res.json("Welcome To Rhythm Store");
 });
 
 app.use("/insert", insertIntoDB);
 app.use("/products", products);
+app.use('/categories' , categories);
 app.use('/auth' , auth)
 app.use('/user' , authVerify , user)
 app.use('/cart' , authVerify , cart)

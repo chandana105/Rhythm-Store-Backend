@@ -1,17 +1,25 @@
 {
   "files": {
+    "index.js": [
+      {
+        "id": "59f60a95-d57a-40ff-b33f-44b5d01dcd99",
+        "line": 7,
+        "version": 355,
+        "index": 293
+      }
+    ],
     "routes/auth.router.js": [
       {
         "id": "7c9a646a-8ef3-45b4-970f-cda6b2158799",
         "line": 11,
-        "version": 1400,
-        "index": 312
+        "version": 1402,
+        "index": 314
       },
       {
         "id": "3c7b1f5e-6b1d-4afb-9b7a-25cd61d2d126",
         "line": 81,
-        "version": 1390,
-        "index": 2344
+        "version": 1402,
+        "index": 2359
       }
     ],
     "routes/cart.router.js": [
