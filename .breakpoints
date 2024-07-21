@@ -8,7 +8,7 @@
         "index": 293
       }
     ],
-    "routes/auth.router.js": [
+    "api/auth.router.js": [
       {
         "id": "7c9a646a-8ef3-45b4-970f-cda6b2158799",
         "line": 11,
@@ -22,7 +22,7 @@
         "index": 2359
       }
     ],
-    "routes/cart.router.js": [
+    "api/cart.router.js": [
       {
         "id": "3d66f7a0-fd5e-40cf-9e56-6853a9dbea5b",
         "line": 32,
